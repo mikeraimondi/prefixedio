@@ -8,8 +8,8 @@ import (
 
 const maxLen = 1048576
 
-// PrefixedWrite writes the size of the bytes passed, then the bytes
-func PrefixedWrite(w io.Writer, bytes []byte) (n int, err error) {
+// WriteBytes writes the size of the bytes passed, then the bytes
+func WriteBytes(w io.Writer, bytes []byte) (n int, err error) {
 	if err = binary.Write(w, binary.BigEndian, uint64(len(bytes))); err != nil {
 		return
 	}

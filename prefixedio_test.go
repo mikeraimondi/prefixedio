@@ -7,12 +7,12 @@ import (
 	"testing"
 )
 
-func TestPrefixedWrite(t *testing.T) {
+func TestWriteBytes(t *testing.T) {
 	t.Parallel()
 
 	in := []byte("foo")
 	buf := &bytes.Buffer{}
-	n, err := PrefixedWrite(buf, in)
+	n, err := WriteBytes(buf, in)
 	if err != nil {
 		t.Fatalf("Error returned: %v\n", err)
 	}
@@ -39,7 +39,7 @@ func TestPrefixedWrite(t *testing.T) {
 	}
 }
 
-func BenchmarkPrefixedWrite(b *testing.B) {
+func BenchmarkWriteBytes(b *testing.B) {
 	testBytes := make([]byte, 1000)
 	for i := range testBytes {
 		testBytes[i] = byte(rand.Int())
@@ -48,7 +48,7 @@ func BenchmarkPrefixedWrite(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		PrefixedWrite(testBuf, testBytes)
+		WriteBytes(testBuf, testBytes)
 		testBuf.Reset()
 	}
 }
