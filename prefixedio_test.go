@@ -56,7 +56,7 @@ func BenchmarkPrefixedWrite(b *testing.B) {
 func TestReadFromWithValidInput(t *testing.T) {
 	t.Parallel()
 
-	var pb PrefixedBuf // Reuse the same buffer between runs
+	var pb Buffer // Reuse the same buffer between runs
 	buf := &bytes.Buffer{}
 	var maxLenBuf bytes.Buffer
 	for i := 0; i < maxLen; i++ {
@@ -101,7 +101,7 @@ func TestReadFromWithInvalidInput(t *testing.T) {
 	for i := 0; i < length; i++ {
 		buf.WriteString("a")
 	}
-	var pb PrefixedBuf
+	var pb Buffer
 	if _, err := pb.ReadFrom(buf); err == nil {
 		t.Fatal("No error raised when message too long")
 	}

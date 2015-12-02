@@ -16,14 +16,14 @@ func PrefixedWrite(w io.Writer, bytes []byte) (n int, err error) {
 	return w.Write(bytes)
 }
 
-// PrefixedBuf is a size-prefixed buffer
-type PrefixedBuf struct {
+// Buffer is a size-prefixed buffer
+type Buffer struct {
 	size int64
 	buf  []byte
 }
 
 // ReadFrom reads the size prefix (s) from rd, then overwrites the buffer with s bytes from rd
-func (p *PrefixedBuf) ReadFrom(rd io.Reader) (n int64, err error) {
+func (p *Buffer) ReadFrom(rd io.Reader) (n int64, err error) {
 	if diff := 8 - len(p.buf); diff > 0 {
 		p.buf = append(p.buf, make([]byte, diff)...)
 	}
@@ -49,6 +49,6 @@ func (p *PrefixedBuf) ReadFrom(rd io.Reader) (n int64, err error) {
 }
 
 // Bytes returns the bytes from the buffer
-func (p *PrefixedBuf) Bytes() []byte {
+func (p *Buffer) Bytes() []byte {
 	return p.buf[:p.size]
 }
