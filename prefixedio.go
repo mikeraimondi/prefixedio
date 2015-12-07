@@ -6,7 +6,8 @@ import (
 	"io"
 )
 
-const maxLen = 1048576
+// MaxLen is the maximum length allowed
+const MaxLen = 1048576
 
 // WriteBytes writes the size of the bytes passed, then the bytes
 func WriteBytes(w io.Writer, bytes []byte) (n int, err error) {
@@ -35,7 +36,7 @@ func (p *Buffer) ReadFrom(rd io.Reader) (n int64, err error) {
 	if p.size == 0 {
 		return
 	}
-	if p.size > maxLen {
+	if p.size > MaxLen {
 		err = fmt.Errorf("Message too large at %v bytes", p.size)
 		return
 	}

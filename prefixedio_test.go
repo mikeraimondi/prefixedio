@@ -1,10 +1,12 @@
-package prefixedio
+package prefixedio_test
 
 import (
 	"bytes"
 	"encoding/binary"
 	"math/rand"
 	"testing"
+
+	"github.com/mikeraimondi/prefixedio"
 )
 
 func TestWriteBytes(t *testing.T) {
@@ -12,7 +14,7 @@ func TestWriteBytes(t *testing.T) {
 
 	in := []byte("foo")
 	buf := &bytes.Buffer{}
-	n, err := WriteBytes(buf, in)
+	n, err := prefixedio.WriteBytes(buf, in)
 	if err != nil {
 		t.Fatalf("Error returned: %v\n", err)
 	}
@@ -34,7 +36,7 @@ func TestWriteBytes(t *testing.T) {
 	}
 	for i, c := range out {
 		if in[i] != c {
-			t.Fatalf("Written value doesn't match input. Expected: %v. Actual: %v\n", in[i], c)
+			t.Fatalf("Written value doesn't match input. Expected: %q. Actual: %q\n", in[i], c)
 		}
 	}
 }
@@ -48,7 +50,7 @@ func BenchmarkWriteBytes(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		WriteBytes(testBuf, testBytes)
+		prefixedio.WriteBytes(testBuf, testBytes)
 		testBuf.Reset()
 	}
 }
@@ -56,10 +58,10 @@ func BenchmarkWriteBytes(b *testing.B) {
 func TestReadFromWithValidInput(t *testing.T) {
 	t.Parallel()
 
-	var pb Buffer // Reuse the same buffer between runs
+	var pb prefixedio.Buffer // Reuse the same buffer between runs
 	buf := &bytes.Buffer{}
 	var maxLenBuf bytes.Buffer
-	for i := 0; i < maxLen; i++ {
+	for i := 0; i < prefixedio.MaxLen; i++ {
 		maxLenBuf.WriteString("Q")
 	}
 	ins := []string{
@@ -80,12 +82,8 @@ func TestReadFromWithValidInput(t *testing.T) {
 		if n != int64(len(in)) {
 			t.Fatalf("Number of read bytes doesn't match input. Expected: %v. Actual: %v\n", len(in), n)
 		}
-		byteStr := string(pb.Bytes())
-		if len(byteStr) <= 0 {
-			t.Fatalf("Read bytes are empty. Expected: non-empty string. Actual: %v\n", byteStr)
-		}
-		if byteStr != in {
-			t.Fatalf("Read bytes doesn't match input. Expected: %v. Actual: %v\n", in, byteStr)
+		if byteStr := string(pb.Bytes()); byteStr != in {
+			t.Fatalf("Read bytes doesn't match input. Expected: %q. Actual: %q\n", in, byteStr)
 		}
 	}
 }
@@ -93,7 +91,7 @@ func TestReadFromWithValidInput(t *testing.T) {
 func TestReadFromWithInvalidInput(t *testing.T) {
 	t.Parallel()
 
-	length := maxLen + 1
+	length := prefixedio.MaxLen + 1
 	buf := bytes.NewBuffer(make([]byte, 0, length+8))
 	if err := binary.Write(buf, binary.BigEndian, uint64(length)); err != nil {
 		t.Fatal("Error on write: ", err)
@@ -101,7 +99,7 @@ func TestReadFromWithInvalidInput(t *testing.T) {
 	for i := 0; i < length; i++ {
 		buf.WriteString("a")
 	}
-	var pb Buffer
+	var pb prefixedio.Buffer
 	if _, err := pb.ReadFrom(buf); err == nil {
 		t.Fatal("No error raised when message too long")
 	}
